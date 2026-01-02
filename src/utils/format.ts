@@ -1,0 +1,62 @@
+// formats large numbers example 1000000 -> 1M (K, M, B, T)
+export function formatNumber(num: number): string {
+    if (num >= 1e12) {
+      return (num / 1e12).toFixed(2) + "T";
+    }
+  
+    if (num >= 1e9) {
+      return (num / 1e9).toFixed(2) + "B";
+    }
+  
+    if (num >= 1e6) {
+      return (num / 1e6).toFixed(2) + "M";
+    }
+  
+    if (num >= 1e3) {
+      return (num / 1e3).toFixed(2) + "K";
+    }
+  
+    return num.toFixed(2);
+  }
+  
+ // formats token balance example 1000000 -> 1000000 USDC
+  export function formatTokenBalance(amount: number, symbol: string): string {
+    const precision = amount < 1 ? 6 : 4;
+    return `${amount.toFixed(precision)} ${symbol}`;
+  }
+  
+  // formats USD amounts example 1000000 -> 1M (K, M, B, T)
+  export function formatUsdAmount(amount: number): string {
+    if (amount >= 1000) {
+      return formatNumber(amount);
+    }
+  
+    if (amount >= 1) {
+      return amount.toFixed(2);
+    }
+  
+    return amount.toFixed(4);
+  }
+  
+  // formats percentage example 0.1234 -> +0.12%
+  export function formatPercentage(percentage: number): string {
+    const formatted = percentage.toFixed(2);
+    return `${percentage >= 0 ? "+" : ""}${formatted}%`;
+  }
+  
+  // formats price example 1000000 -> 1M (K, M, B, T)
+  export function formatPrice(price: number): string {
+    if (price >= 1000) {
+      return formatNumber(price);
+    }
+  
+    if (price >= 1) {
+      return price.toFixed(4);
+    }
+  
+    if (price >= 0.01) {
+      return price.toFixed(6);
+    }
+  
+    return price.toFixed(8);
+  }
