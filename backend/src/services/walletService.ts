@@ -43,6 +43,24 @@ export async function getWalletAddress(userId: string): Promise<string> {
 }
 
 /**
+ * Get wallet credentials (address + private key) for a user
+ * WARNING: Private key is sensitive - only return to authenticated users for their own wallet
+ */
+export async function getWalletCredentials(userId: string): Promise<{
+  address: string;
+  privateKey: string;
+}> {
+  const privateKeyBytes = await derivePrivateKey(userId);
+  const privateKey = new Ed25519PrivateKey(privateKeyBytes);
+  const account = Account.fromPrivateKey({ privateKey });
+  
+  return {
+    address: account.accountAddress.toString(),
+    privateKey: Buffer.from(privateKeyBytes).toString("hex"),
+  };
+}
+
+/**
  * Get MOVE balance for an address using native fetch (Bun compatible)
  */
 export async function getMoveBalance(address: string): Promise<{

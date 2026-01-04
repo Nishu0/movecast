@@ -49,3 +49,5 @@ export interface TokenInfo {
     chartImageUrl: string;
     message?: string;
   }
+
+  export type NetworkType = "testnet" | "mainnet" | "devnet";

@@ -1,0 +1,156 @@
+[
+    {
+        "data": [
+            {
+                "key": {
+                    "inner": "0x447721a30109c662dde9c73a0c2c9c9c459fb5e5a9c92f03c50fa69737f5d08d"
+                },
+                "name": "USDC.e",
+                "is_verified": true,
+                "logo": "https://tether.to/images/logoCircle.svg",
+                "value": 6
+            },
+            {
+                "key": {
+                    "inner": "0xa"
+                },
+                "value": 8
+            },
+            {
+                "key": {
+                    "inner": "0x908828f4fb0213d4034c3ded1630bbd904e8a3a6bf3c63270887f0b06653a376"
+                },
+                "name": "WETH.e",
+                "is_verified": true,
+                "logo": "https://etherscan.io/token/images/weth_28.png",
+                "value": 8
+            },
+            {
+                "key": {
+                    "inner": "0x83121c9f9b0527d1f056e21a950d6bf3b9e9e2e8353d0e95ccea726713cbea39"
+                },
+                "name": "USDC.e",
+                "is_verified": true,
+                "logo": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/Brand/USDC/USDC_Icon.svg",
+                "value": 6
+            },
+            {
+                "key": {
+                    "inner": "0xb06f29f24dde9c6daeec1f930f14a441a8d6c0fbea590725e88b340af3e1939c"
+                },
+                "name": "WBTC.e",
+                "is_verified": true,
+                "logo": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1747036384",
+                "value": 8
+            },
+            {
+                "key": {
+                    "inner": "0xad8a8c8c15e11ea5ccefae1808d4c37dd3888e3545febf5a928215b73bf3c4b0"
+                },
+                "name": "WEUSD Coin",
+                "is_verified": false,
+                "logo": "https://raw.githubusercontent.com/pipimove/logo/refs/heads/main/coin_weusd.ico",
+                "value": 6
+            },
+            {
+                "key": {
+                    "inner": "0xf5670624772bf9f5804e8d21d6a77d30d210fe84f28f5c095b5eb64e479c0d03"
+                },
+                "name": "PIPI Coin",
+                "is_verified": false,
+                "logo": "https://raw.githubusercontent.com/pipimove/logo/37b754e8becbf94ba0089d45821996700c7a6b27/pipi.ico",
+                "value": 6
+            },
+            {
+                "key": {
+                    "inner": "0x658f4ef6f76c8eeffdc06a30946f3f06723a7f9532e2413312b2a612183759c"
+                },
+                "name": "Lombard Staked Bitcoin",
+                "is_verified": true,
+                "logo": "https://assets.coingecko.com/coins/images/39969/standard/LBTC_Logo.png?1724959872",
+                "value": 8
+            },
+            {
+                "key": {
+                    "inner": "0x2f6af255328fe11b88d840d1e367e946ccd16bd7ebddd6ee7e2ef9f7ae0c53ef"
+                },
+                "name": "Renzo Restaked ETH",
+                "is_verified": true,
+                "logo": "https://assets.coingecko.com/coins/images/34753/standard/Ezeth_logo_circle.png?1713496404",
+                "value": 8
+            },
+            {
+                "key": {
+                    "inner": "0x74f0c7504507f7357f8a218cc70ce3fc0f4b4e9eb8474e53ca778cb1e0c6dcc5"
+                },
+                "name": "Staked USDe",
+                "is_verified": true,
+                "logo": "https://rghmbd4ywaokbsamxuto2dc6idoziri25gcwi2luupeyyty7ogsa.arweave.net/iY7Aj5iwHKDIDL0m7QxeQN2URRrphWRpdKPJjE8fcaQ",
+                "value": 6
+            },
+            {
+                "key": {
+                    "inner": "0x7c9d9f4972072b6ff7dfa48f259688e7286abac9ebd192bbda30fea910139024"
+                },
+                "name": "Move USD",
+                "is_verified": true,
+                "logo": "https://raw.githubusercontent.com/arche-labs/assets/refs/heads/main/icons/MSD_200x200.png",
+                "value": 6
+            },
+            {
+                "key": {
+                    "inner": "0x9d146a4c9472a7e7b0dbc72da0eafb02b54173a956ef22a9fba29756f8661c6c"
+                },
+                "name": "USDe",
+                "is_verified": true,
+                "logo": "https://vhskortpyursu74scppzudzi242b4ghoabztbwqqu66iyriozs7a.arweave.net/qeSnRm_FIyp_khPfmg8o1zQeGO4AczDaEKe8jEUOzL4",
+                "value": 6
+            },
+            {
+                "key": {
+                    "inner": "0x48b904a97eafd065ced05168ec44638a63e1e3bcaec49699f6b8dabbd1424650"
+                },
+                "name": "USDa",
+                "is_verified": true,
+                "logo": "https://ipfs.io/ipfs/QmTSVkJWeavEUEVM76RRejCmme8NvHcAqzTG884pKZjRFz/usda.png",
+                "value": 8
+            },
+            {
+                "key": {
+                    "inner": "0x527c43638a6c389a9ad702e7085f31c48223624d5102a5207dfab861f482c46d"
+                },
+                "name": "SolvBTC",
+                "is_verified": true,
+                "logo": "https://assets.coingecko.com/coins/images/36800/standard/solvBTC.png?1719810684",
+                "value": 8
+            },
+            {
+                "key": {
+                    "inner": "0x967d9125a338c5b1e22b6aacaa8d14b2b8b785ca44b614803ecbcdb4898229f3"
+                },
+                "name": "Capy Coin",
+                "is_verified": true,
+                "logo": "https://www.capygo.io/coin_logo/capycoin_v1.png",
+                "value": 8
+            },
+            {
+                "key": {
+                    "inner": "0x51ffc9885233adf3dd411078cad57535ed1982013dc82d9d6c433a55f2e0035d"
+                },
+                "name": "KelpDao Restaked ETH",
+                "is_verified": true,
+                "logo": "https://assets.coingecko.com/coins/images/33800/standard/Icon___Dark.png?1702991855",
+                "value": 8
+            },
+            {
+                "key": {
+                    "inner": "0xe699e6c1733462632821b6e5b954c0ed3aa9ad1efb70b6ce92616952ade89258"
+                },
+                "name": "sUSDa",
+                "is_verified": true,
+                "logo": "https://ipfs.io/ipfs/QmTSVkJWeavEUEVM76RRejCmme8NvHcAqzTG884pKZjRFz/susda.png",
+                "value": 8
+            }
+        ]
+    }
+]

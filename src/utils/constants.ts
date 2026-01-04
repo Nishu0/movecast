@@ -15,3 +15,9 @@ export const backendClient = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+// Display formatting
+export const ADDRESS_TRUNCATE_START = 8;
+export const ADDRESS_TRUNCATE_END = 6;
+export const EXPLORER_BASE_URL = "https://explorer.movementnetwork.xyz";
+export const DEFAULT_NETWORK = "mainnet" as const;

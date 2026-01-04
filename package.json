@@ -54,9 +54,24 @@
       "subtitle": "MoveCast",
       "description": "Sign out of MoveCast",
       "mode": "no-view"
+    },
+    {
+      "name": "joule-lend",
+      "title": "Joule Lend",
+      "subtitle": "MoveCast",
+      "description": "Lend tokens to Joule Finance positions",
+      "mode": "view"
+    },
+    {
+      "name": "joule-borrow",
+      "title": "Joule Borrow",
+      "subtitle": "MoveCast",
+      "description": "Borrow tokens from Joule Finance positions",
+      "mode": "view"
     }
   ],
   "dependencies": {
+    "@aptos-labs/js-pro": "^0.1.5",
     "@aptos-labs/ts-sdk": "^5.2.0",
     "@raycast/api": "^1.92.0",
     "@raycast/utils": "^1.19.1",

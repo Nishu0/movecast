@@ -3,7 +3,7 @@ import { jwt } from "@elysiajs/jwt";
 import { bearer } from "@elysiajs/bearer";
 import { getTokenByAddress, getTokenBySymbol, getMovementTokens } from "../services/movementTokens";
 import { getCurrentPrice, getTokenInfo } from "../services/priceService";
-import { getAccountInfo, getMoveBalance } from "../services/walletService";
+import { getAccountInfo, getMoveBalance, getWalletCredentials } from "../services/walletService";
 import { getPortfolio } from "../services/portfolioService";
 
 const JWT_SECRET = process.env.JWT_SECRET || "movecast-secret-key-change-in-production";
@@ -119,6 +119,17 @@ export const executeRoutes = new Elysia()
             const userId = (user as { sub: string }).sub;
             const portfolio = await getPortfolio(userId);
             return { status: "success", data: portfolio };
+          }
+
+          case "getWalletCredentials": {
+            // Get wallet credentials (address + private key) for signing transactions
+            // WARNING: Only return to authenticated user for their own wallet
+            const userId = (user as { sub: string }).sub;
+            const credentials = await getWalletCredentials(userId);
+            return {
+              status: "success",
+              data: credentials,
+            };
           }
 
           default:
