@@ -68,6 +68,27 @@
       "subtitle": "MoveCast",
       "description": "Borrow tokens from Joule Finance positions",
       "mode": "view"
+    },
+    {
+      "name": "joule-withdraw",
+      "title": "Joule Withdraw",
+      "subtitle": "MoveCast",
+      "description": "Withdraw tokens from Joule Finance positions",
+      "mode": "view"
+    },
+    {
+      "name": "joule-repay",
+      "title": "Joule Repay",
+      "subtitle": "MoveCast",
+      "description": "Repay tokens to Joule Finance positions",
+      "mode": "view"
+    },
+    {
+      "name": "meridian-swap",
+      "title": "Meridian Swap",
+      "subtitle": "MoveCast",
+      "description": "Swap tokens on Meridian DEX",
+      "mode": "view"
     }
   ],
   "dependencies": {
