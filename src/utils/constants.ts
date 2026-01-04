@@ -6,8 +6,8 @@ export const STORAGE_KEYS = {
   STATE: "googleAuthState", // Temporary
 };
 
-export const BASE_BACKEND_URL = "";
-export const BACKEND_CALLBACK_URL = "";
+export const BASE_BACKEND_URL = "http://localhost:8787/api";
+export const BACKEND_CALLBACK_URL = "http://localhost:8787/api/auth/callback";
 
 export const backendClient = axios.create({
   baseURL: BASE_BACKEND_URL,

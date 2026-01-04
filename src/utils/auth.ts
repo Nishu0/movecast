@@ -5,7 +5,7 @@ import { CacheAdapter } from "./cache";
 import { URL_ENDPOINTS } from "../constants/endpoints";
 
 const client = new OAuth.PKCEClient({
-  redirectMethod: OAuth.RedirectMethod.AppURI,
+  redirectMethod: OAuth.RedirectMethod.Web,
   providerName: "MoveCast",
   providerIcon: "icon.png",
   providerId: "google",
