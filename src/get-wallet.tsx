@@ -2,31 +2,70 @@ import { ActionPanel, Action, Detail, showToast, Toast, Icon, useNavigation } fr
 import { useState, useEffect } from "react";
 import { executeAction } from "./utils/api-wrapper";
 import { provider } from "./utils/auth";
-import { withAccessToken } from "@raycast/utils";
 import GetPortfolio from "./get-portfolio";
+
+interface WalletData {
+  address: string;
+  explorerUrl: string;
+}
+
+interface BalanceData {
+  address: string;
+  balance: number;
+  balanceFormatted: string;
+  symbol: string;
+  explorerUrl: string;
+}
 
 function GetWalletAddress() {
   const { pop } = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [balance, setBalance] = useState<string>("");
+  const [explorerUrl, setExplorerUrl] = useState<string>("");
+
   useEffect(() => {
-    loadWallet();
+    authenticate();
   }, []);
+
+  async function authenticate() {
+    try {
+      setIsLoading(true);
+      console.log("Starting authentication...");
+      await provider.authorize();
+      console.log("Authentication successful!");
+      await loadWallet();
+    } catch (error) {
+      console.error("Auth error:", error);
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Authentication Failed",
+        message: error instanceof Error ? error.message : "Please try again",
+      });
+      setIsLoading(false);
+    }
+  }
 
   async function loadWallet() {
     try {
-      setIsLoading(true);
-      const result = await executeAction("getWalletAddress", {}, true, 1000 * 60 * 60 * 24);
-      const balance = await executeAction("getSolBalance", {}, true, 1000 * 60);
-      setWalletAddress(result.data?.toString() || "");
-      setBalance(balance.data?.toString() || "");
+      // Get wallet address
+      const walletResult = await executeAction<WalletData>("getWalletAddress", {}, false);
+      if (walletResult.data) {
+        setWalletAddress(walletResult.data.address);
+        setExplorerUrl(walletResult.data.explorerUrl);
+      }
+
+      // Get MOVE balance
+      const balanceResult = await executeAction<BalanceData>("getMoveBalance", {}, false);
+      if (balanceResult.data) {
+        setBalance(balanceResult.data.balanceFormatted);
+      }
     } catch (error) {
       console.error(error);
       await showToast({
         style: Toast.Style.Failure,
         title: "Error",
-        message: error instanceof Error ? error.message : "Failed to load wallet address",
+        message: error instanceof Error ? error.message : "Failed to load wallet",
       });
     } finally {
       setIsLoading(false);
@@ -56,7 +95,7 @@ function GetWalletAddress() {
     }
   }
 
-  const markdown = `# Wallet
+  const markdown = `# 🟣 Movement Wallet
 
 ${
   isLoading
@@ -66,31 +105,28 @@ Please wait while we fetch your wallet...
 `
     : walletAddress
       ? `
-### Your Wallet Address
+### Your Movement Wallet Address
 
 \`\`\`
 ${walletAddress}
 \`\`\`
 
-### Your SOL Balance
+### Your MOVE Balance
 
 \`\`\`
-${balance} SOL
+${balance} MOVE
 \`\`\`
-
-####
-
-[View Wallet on Solscan](https://solscan.io/account/${walletAddress})
 
 ---
 
+[🔍 View on Movement Explorer](${explorerUrl})
+
 `
       : `
-## ❌ Error Loading Address
+## ❌ Error Loading Wallet
 Unable to fetch your wallet address. Please try refreshing.
 `
 }
-
 `;
 
   return (
@@ -109,4 +145,4 @@ Unable to fetch your wallet address. Please try refreshing.
   );
 }
 
-export default withAccessToken(provider)(GetWalletAddress);
+export default GetWalletAddress;

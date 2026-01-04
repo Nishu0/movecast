@@ -14,8 +14,12 @@ export const NATIVE_MOVE_COIN_TYPE = "0x1::aptos_coin::AptosCoin";
 function getMarkdown(
   tokenInfo: TokenInfo,
   tokenAddress: string,
-  { chartDuration, chartDataUrl }: { chartDuration?: string; chartDataUrl?: string },
+  { chartDuration, chartDataUrl, chartMessage }: { chartDuration?: string; chartDataUrl?: string; chartMessage?: string },
 ): string {
+  const chartSection = chartDataUrl 
+    ? `![Chart](${chartDataUrl}?raycast-width=400&raycast-height=300)` 
+    : chartMessage || "📊 No historical price data available yet. Data will be collected over time.";
+
   return `# ${tokenInfo.name} (${tokenInfo.symbol})
 
 ### Token Address
@@ -24,9 +28,9 @@ function getMarkdown(
 ${tokenAddress}
 \`\`\`
 
-### Price Chart: ${chartDuration}
+### Price Chart: ${chartDuration || ""}
 
-${chartDataUrl ? `![Chart](${chartDataUrl}?raycast-width=400&raycast-height=300)` : "No chart data available"}`;
+${chartSection}`;
 }
 
 const ChartDurationOptions = {
@@ -62,6 +66,7 @@ function GetTokenOverview(props: LaunchProps<{ arguments: { tokenAddress: string
   const [tokenAddress, setTokenAddress] = useState<string>("");
   const [chartDataUrl, setChartDataUrl] = useState<string | undefined>(undefined);
   const [chartDurationLabel, setChartDurationLabel] = useState<string | undefined>(undefined);
+  const [chartMessage, setChartMessage] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (props.arguments.tokenAddress) {
@@ -136,6 +141,7 @@ function GetTokenOverview(props: LaunchProps<{ arguments: { tokenAddress: string
           size: "large",
         });
         setChartDataUrl(chart.data?.chartImageUrl);
+        setChartMessage(chart.data?.message);
         setChartDurationLabel(ChartDurationOptions["1D"].title);
       } catch (chartError) {
         showFailureToast(chartError, { title: "Error fetching chart" });
@@ -164,6 +170,7 @@ function GetTokenOverview(props: LaunchProps<{ arguments: { tokenAddress: string
       size: "large",
     });
     setChartDataUrl(chart.data?.chartImageUrl);
+    setChartMessage(chart.data?.message);
     setChartDurationLabel(title);
   }
 
@@ -187,7 +194,7 @@ function GetTokenOverview(props: LaunchProps<{ arguments: { tokenAddress: string
   return (
     <Detail
       isLoading={isLoading}
-      markdown={getMarkdown(tokenInfo, tokenAddress, { chartDataUrl, chartDuration: chartDurationLabel })}
+      markdown={getMarkdown(tokenInfo, tokenAddress, { chartDataUrl, chartDuration: chartDurationLabel, chartMessage })}
       metadata={
         <Detail.Metadata>
           <Detail.Metadata.TagList title="Symbol">

@@ -78,7 +78,14 @@ export async function getMovementTokens(): Promise<MovementToken[]> {
 
 export async function getTokenByAddress(address: string): Promise<MovementToken | undefined> {
   const tokens = await getMovementTokens();
-  const normalizedAddress = address.toLowerCase().replace(/^@/, "0x");
+  
+  // Normalize: replace @ with 0x, or add 0x if missing
+  let normalizedAddress = address.toLowerCase().trim();
+  if (normalizedAddress.startsWith("@")) {
+    normalizedAddress = "0x" + normalizedAddress.slice(1);
+  } else if (!normalizedAddress.startsWith("0x") && /^[a-f0-9]+$/.test(normalizedAddress)) {
+    normalizedAddress = "0x" + normalizedAddress;
+  }
   
   return tokens.find(
     (t) =>
@@ -93,7 +100,13 @@ export async function getTokenBySymbol(symbol: string): Promise<MovementToken | 
 }
 
 export function isValidMovementToken(address: string, tokens: MovementToken[]): boolean {
-  const normalizedAddress = address.toLowerCase().replace(/^@/, "0x");
+  // Normalize: replace @ with 0x, or add 0x if missing
+  let normalizedAddress = address.toLowerCase().trim();
+  if (normalizedAddress.startsWith("@")) {
+    normalizedAddress = "0x" + normalizedAddress.slice(1);
+  } else if (!normalizedAddress.startsWith("0x") && /^[a-f0-9]+$/.test(normalizedAddress)) {
+    normalizedAddress = "0x" + normalizedAddress;
+  }
   
   return tokens.some(
     (t) =>

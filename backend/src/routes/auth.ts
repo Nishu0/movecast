@@ -83,6 +83,9 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
   )
   .use(bearer())
   .derive(async ({ bearer, jwt, set }) => {
+    console.log("=== AUTH MIDDLEWARE ===");
+    console.log("Bearer token:", bearer ? `${bearer.substring(0, 50)}...` : "null");
+    
     if (!bearer) {
       set.status = 401;
       return { user: null as Record<string, unknown> | null, authError: "Missing authorization header" as string | null };
@@ -90,12 +93,14 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 
     try {
       const user = await jwt.verify(bearer);
+      console.log("JWT verify result:", user ? "valid" : "null");
       if (!user) {
         set.status = 401;
         return { user: null as Record<string, unknown> | null, authError: "Invalid or expired token" as string | null };
       }
       return { user: user as Record<string, unknown>, authError: null as string | null };
-    } catch {
+    } catch (error) {
+      console.error("JWT verify error:", error);
       set.status = 401;
       return { user: null as Record<string, unknown> | null, authError: "Invalid or expired token" as string | null };
     }

@@ -1,22 +1,71 @@
 import { Elysia, t } from "elysia";
-import { authMiddleware } from "./auth";
+import { jwt } from "@elysiajs/jwt";
+import { bearer } from "@elysiajs/bearer";
 import { getTokenByAddress, getTokenBySymbol, getMovementTokens } from "../services/movementTokens";
 import { getCurrentPrice, getTokenInfo } from "../services/priceService";
+import { getAccountInfo, getMoveBalance } from "../services/walletService";
+import { getPortfolio } from "../services/portfolioService";
+
+const JWT_SECRET = process.env.JWT_SECRET || "movecast-secret-key-change-in-production";
 
 export const executeRoutes = new Elysia()
-  .use(authMiddleware)
+  .use(jwt({ name: "jwt", secret: JWT_SECRET }))
+  .use(bearer())
   .post(
     "/execute.action",
-    async ({ body, user, authError, set }) => {
-      if (authError || !user) {
+    async ({ body, bearer, jwt, set }) => {
+      // Verify JWT token
+      if (!bearer) {
         set.status = 401;
-        return { status: "error", message: authError || "Unauthorized" };
+        return { status: "error", message: "Missing authorization header" };
+      }
+
+      let user;
+      try {
+        user = await jwt.verify(bearer);
+        if (!user) {
+          set.status = 401;
+          return { status: "error", message: "Invalid or expired token" };
+        }
+      } catch (error) {
+        console.error("JWT verify error:", error);
+        set.status = 401;
+        return { status: "error", message: "Invalid or expired token" };
       }
 
       try {
         const { method, params = {} } = body;
 
         switch (method) {
+          case "getWalletAddress": {
+            // Get user's Movement wallet address
+            const userId = (user as { sub: string }).sub;
+            const accountInfo = await getAccountInfo(userId);
+            return {
+              status: "success",
+              data: {
+                address: accountInfo.address,
+                explorerUrl: accountInfo.explorerUrl,
+              },
+            };
+          }
+
+          case "getMoveBalance": {
+            // Get MOVE balance for the user's wallet
+            const userId = (user as { sub: string }).sub;
+            const accountInfo = await getAccountInfo(userId);
+            return {
+              status: "success",
+              data: {
+                address: accountInfo.address,
+                balance: accountInfo.balance,
+                balanceFormatted: accountInfo.balanceFormatted,
+                symbol: "MOVE",
+                explorerUrl: accountInfo.explorerUrl,
+              },
+            };
+          }
+
           case "getToken": {
             const tokenId = (params as { tokenId?: string }).tokenId;
             if (!tokenId) {
@@ -66,28 +115,9 @@ export const executeRoutes = new Elysia()
           }
 
           case "getPortfolio": {
-            // Mock portfolio data
-            const tokens = await getMovementTokens();
-            const portfolio = [];
-
-            for (const token of tokens.slice(0, 5)) {
-              const price = await getCurrentPrice(token.faAddress);
-              const balance = Math.random() * 1000;
-              portfolio.push({
-                address: token.faAddress,
-                decimals: token.decimals,
-                balance: balance * Math.pow(10, token.decimals),
-                uiAmount: balance,
-                chainId: "movement",
-                name: token.name,
-                symbol: token.symbol,
-                icon: token.logoUrl,
-                logoURI: token.logoUrl,
-                priceUsd: price,
-                valueUsd: balance * price,
-              });
-            }
-
+            // Fetch real portfolio from user's wallet
+            const userId = (user as { sub: string }).sub;
+            const portfolio = await getPortfolio(userId);
             return { status: "success", data: portfolio };
           }
 

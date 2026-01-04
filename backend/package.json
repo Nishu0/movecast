@@ -9,9 +9,11 @@
     "build": "bun build src/index.ts --outdir ./dist --target bun"
   },
   "dependencies": {
+    "@aptos-labs/ts-sdk": "^1.33.1",
     "@elysiajs/bearer": "^1.1.2",
     "@elysiajs/cors": "^1.1.1",
     "@elysiajs/jwt": "^1.1.1",
+    "@privy-io/server-auth": "^1.32.5",
     "@pythnetwork/hermes-client": "^2.1.0",
     "@pythnetwork/pyth-aptos-js": "^1.5.0",
     "elysia": "^1.2.25",

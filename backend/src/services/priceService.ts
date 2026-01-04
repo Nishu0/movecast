@@ -35,7 +35,9 @@ interface CoinGeckoMarketData {
   totalVolume: number;
   circulatingSupply: number;
   totalSupply: number;
+  priceChange1h: number;
   priceChange24h: number;
+  priceChange7d: number;
   lastUpdated: number;
 }
 
@@ -91,7 +93,7 @@ async function fetchCoinGeckoMarketData(): Promise<Map<string, CoinGeckoMarketDa
     }
 
     const idsParam = coingeckoIds.join(",");
-    const url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${idsParam}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`;
+    const url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${idsParam}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h,24h,7d`;
 
     const response = await fetch(url, {
       headers: {
@@ -111,6 +113,9 @@ async function fetchCoinGeckoMarketData(): Promise<Map<string, CoinGeckoMarketDa
       total_volume: number | null;
       circulating_supply: number | null;
       total_supply: number | null;
+      price_change_percentage_1h_in_currency: number | null;
+      price_change_percentage_24h_in_currency: number | null;
+      price_change_percentage_7d_in_currency: number | null;
       price_change_percentage_24h: number | null;
     }>;
 
@@ -123,7 +128,9 @@ async function fetchCoinGeckoMarketData(): Promise<Map<string, CoinGeckoMarketDa
         totalVolume: coin.total_volume || 0,
         circulatingSupply: coin.circulating_supply || 0,
         totalSupply: coin.total_supply || 0,
-        priceChange24h: coin.price_change_percentage_24h || 0,
+        priceChange1h: coin.price_change_percentage_1h_in_currency || 0,
+        priceChange24h: coin.price_change_percentage_24h_in_currency || coin.price_change_percentage_24h || 0,
+        priceChange7d: coin.price_change_percentage_7d_in_currency || 0,
         lastUpdated: now,
       });
     }
@@ -290,14 +297,27 @@ export function getPriceChanges(address: string, currentPrice: number): PriceCha
 
 // Get current price for a token - uses Pyth for real prices
 export async function getCurrentPrice(address: string): Promise<number> {
-  // First try to find in Pyth tokens
-  let pythToken = getPythTokenByAddress(address);
+  // Special case: handle native MOVE token (0x1 or 0x1::aptos_coin::AptosCoin)
+  const normalizedAddr = address.toLowerCase();
+  const isNativeMove = normalizedAddr === "0x1" || 
+                       normalizedAddr === "0x1::aptos_coin::aptoscoin" ||
+                       normalizedAddr.includes("aptos_coin::aptoscoin");
   
-  // If not found by address, try to get Movement token and match by symbol
-  if (!pythToken) {
-    const movementToken = await getTokenByAddress(address);
-    if (movementToken) {
-      pythToken = getPythTokenBySymbol(movementToken.symbol);
+  let pythToken: PythTokenData | undefined;
+  
+  if (isNativeMove) {
+    // Directly get MOVE token by symbol
+    pythToken = getPythTokenBySymbol("MOVE");
+  } else {
+    // First try to find in Pyth tokens by address
+    pythToken = getPythTokenByAddress(address);
+    
+    // If not found by address, try to get Movement token and match by symbol
+    if (!pythToken) {
+      const movementToken = await getTokenByAddress(address);
+      if (movementToken) {
+        pythToken = getPythTokenBySymbol(movementToken.symbol);
+      }
     }
   }
   
@@ -352,7 +372,28 @@ export async function getTokenInfo(token: MovementToken): Promise<TokenInfo> {
       holders = Math.floor(marketCap / 1000) + 1000; // Minimum ~1k holders
     }
     
-    // Use 24h price change from CoinGecko if our tracked data is insufficient
+    // Use CoinGecko price changes for all timeframes
+    // 1h data from CoinGecko - use for 30min, 1hr
+    if (marketData.priceChange1h !== 0) {
+      if (priceChanges["30 minutes"] === 0) {
+        priceChanges["30 minutes"] = marketData.priceChange1h * 0.5; // Approximate 30min as half of 1h
+      }
+      if (priceChanges["1 hour"] === 0) {
+        priceChanges["1 hour"] = marketData.priceChange1h;
+      }
+    }
+    
+    // Interpolate 6h and 12h from 1h and 24h
+    if (marketData.priceChange1h !== 0 && marketData.priceChange24h !== 0) {
+      if (priceChanges["6 hours"] === 0) {
+        priceChanges["6 hours"] = marketData.priceChange1h + (marketData.priceChange24h - marketData.priceChange1h) * 0.25;
+      }
+      if (priceChanges["12 hours"] === 0) {
+        priceChanges["12 hours"] = marketData.priceChange1h + (marketData.priceChange24h - marketData.priceChange1h) * 0.5;
+      }
+    }
+    
+    // Use 24h price change from CoinGecko
     if (priceChanges["24 hours"] === 0 && marketData.priceChange24h !== 0) {
       priceChanges["24 hours"] = marketData.priceChange24h;
     }
@@ -462,19 +503,31 @@ async function generateChartUrl(items: PriceHistoryItem[], symbol: string): Prom
     return "";
   }
 
+  // Sample data to max 60 points to keep URL short
+  const maxPoints = 60;
+  let sampledItems = items;
+  if (items.length > maxPoints) {
+    const sampleStep = Math.floor(items.length / maxPoints);
+    sampledItems = items.filter((_, i) => i % sampleStep === 0);
+    // Always include the last item
+    if (sampledItems[sampledItems.length - 1] !== items[items.length - 1]) {
+      sampledItems.push(items[items.length - 1]);
+    }
+  }
+
   const chart = new QuickChart();
 
-  // Limit labels for readability
-  const step = Math.max(1, Math.floor(items.length / 10));
-  const labels = items.map((item, i) => {
-    if (i % step === 0) {
+  // Create labels - show only every few points
+  const labelStep = Math.max(1, Math.floor(sampledItems.length / 8));
+  const labels = sampledItems.map((item, i) => {
+    if (i % labelStep === 0 || i === sampledItems.length - 1) {
       const date = new Date(item.unixTime * 1000);
-      return date.toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit" });
+      return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
     }
     return "";
   });
 
-  const data = items.map((item) => item.value);
+  const data = sampledItems.map((item) => Number(item.value.toFixed(2)));
 
   // Determine if price is up or down
   const isUp = data.length > 1 && data[data.length - 1] >= data[0];
@@ -526,7 +579,14 @@ async function generateChartUrl(items: PriceHistoryItem[], symbol: string): Prom
   chart.setHeight(400);
   chart.setBackgroundColor("#1a1a2e");
 
-  return chart.getUrl();
+  try {
+    // Use short URL to avoid URL length issues
+    const shortUrl = await chart.getShortUrl();
+    return shortUrl;
+  } catch (error) {
+    console.error("Error generating short chart URL, falling back to regular URL:", error);
+    return chart.getUrl();
+  }
 }
 
 export async function getPriceHistory(
@@ -541,16 +601,94 @@ export async function getPriceHistory(
     throw new Error("Token not found in Movement Labs token list");
   }
 
-  // First, fetch current price to ensure we have latest data
-  await getCurrentPrice(address);
-
-  const items = getPriceHistoryData(address, timeFrom, timeTo, timeInterval);
+  // Get Pyth token to find CoinGecko ID
+  const pythToken = getPythTokenBySymbol(token.symbol);
+  
+  // Try to fetch historical data from CoinGecko
+  let items: PriceHistoryItem[] = [];
+  
+  if (pythToken?.coingeckoId) {
+    items = await fetchCoinGeckoHistoricalPrices(pythToken.coingeckoId, timeFrom, timeTo);
+  }
+  
+  // Fallback to our recorded data if CoinGecko fails
+  if (items.length < 2) {
+    items = getPriceHistoryData(address, timeFrom, timeTo, timeInterval);
+  }
+  
+  // If still no data, return message
+  if (items.length < 2) {
+    return {
+      items: [],
+      chartImageUrl: "",
+      message: "No historical price data available yet.",
+    };
+  }
+  
   const chartImageUrl = await generateChartUrl(items, token.symbol);
 
   return {
     items,
     chartImageUrl,
   };
+}
+
+// Fetch historical price data from CoinGecko
+async function fetchCoinGeckoHistoricalPrices(
+  coingeckoId: string,
+  timeFrom: number,
+  timeTo: number
+): Promise<PriceHistoryItem[]> {
+  try {
+    // Calculate days for the API (CoinGecko uses days, not timestamps for free tier)
+    const durationSeconds = timeTo - timeFrom;
+    const durationDays = Math.ceil(durationSeconds / 86400);
+    
+    // Use market_chart endpoint with days parameter
+    // 1 day = 5-minute intervals, 2-90 days = hourly, 90+ days = daily
+    const days = Math.min(Math.max(durationDays, 1), 365);
+    
+    const url = `https://api.coingecko.com/api/v3/coins/${coingeckoId}/market_chart?vs_currency=usd&days=${days}`;
+    
+    const response = await fetch(url, {
+      headers: {
+        "Accept": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`CoinGecko historical API error: ${response.status}`);
+      return [];
+    }
+
+    const data = await response.json() as {
+      prices: [number, number][]; // [timestamp_ms, price]
+    };
+
+    if (!data.prices || !Array.isArray(data.prices)) {
+      return [];
+    }
+
+    // Convert to our format and filter by requested time range
+    const items: PriceHistoryItem[] = [];
+    const fromMs = timeFrom * 1000;
+    const toMs = timeTo * 1000;
+
+    for (const [timestamp, price] of data.prices) {
+      if (timestamp >= fromMs && timestamp <= toMs) {
+        items.push({
+          unixTime: Math.floor(timestamp / 1000),
+          value: price,
+        });
+      }
+    }
+
+    console.log(`Fetched ${items.length} historical prices for ${coingeckoId} from CoinGecko`);
+    return items;
+  } catch (error) {
+    console.error("Error fetching CoinGecko historical prices:", error);
+    return [];
+  }
 }
 
 export async function getAllTokenPrices(): Promise<{ token: MovementToken; price: number }[]> {

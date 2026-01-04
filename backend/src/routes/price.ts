@@ -1,16 +1,32 @@
 import { Elysia, t } from "elysia";
-import { authMiddleware } from "./auth";
+import { jwt } from "@elysiajs/jwt";
+import { bearer } from "@elysiajs/bearer";
 import { getPriceHistory, getCurrentPrice } from "../services/priceService";
 import { getMovementTokens, isValidMovementToken } from "../services/movementTokens";
 
+const JWT_SECRET = process.env.JWT_SECRET || "movecast-secret-key-change-in-production";
+
 export const priceRoutes = new Elysia()
-  .use(authMiddleware)
+  .use(jwt({ name: "jwt", secret: JWT_SECRET }))
+  .use(bearer())
   .post(
     "/get-price-history",
-    async ({ body, user, authError, set }) => {
-      if (authError || !user) {
+    async ({ body, bearer, jwt, set }) => {
+      // Verify JWT token
+      if (!bearer) {
         set.status = 401;
-        return { status: "error", message: authError || "Unauthorized" };
+        return { status: "error", message: "Missing authorization header" };
+      }
+
+      try {
+        const user = await jwt.verify(bearer);
+        if (!user) {
+          set.status = 401;
+          return { status: "error", message: "Invalid or expired token" };
+        }
+      } catch {
+        set.status = 401;
+        return { status: "error", message: "Invalid or expired token" };
       }
 
       try {
@@ -57,10 +73,22 @@ export const priceRoutes = new Elysia()
       }),
     }
   )
-  .get("/price/:address", async ({ params, user, authError, set }) => {
-    if (authError || !user) {
+  .get("/price/:address", async ({ params, bearer, jwt, set }) => {
+    // Verify JWT token
+    if (!bearer) {
       set.status = 401;
-      return { status: "error", message: authError || "Unauthorized" };
+      return { status: "error", message: "Missing authorization header" };
+    }
+
+    try {
+      const user = await jwt.verify(bearer);
+      if (!user) {
+        set.status = 401;
+        return { status: "error", message: "Invalid or expired token" };
+      }
+    } catch {
+      set.status = 401;
+      return { status: "error", message: "Invalid or expired token" };
     }
 
     try {

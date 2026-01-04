@@ -58,6 +58,9 @@ export async function executeAction<T>(
 
   try {
     const token = await LocalStorage.getItem<string>(STORAGE_KEYS.BACKEND_SESSION_TOKEN);
+    console.log("=== EXECUTE ACTION ===");
+    console.log("Method:", method);
+    console.log("Token from storage:", token ? `${token.substring(0, 50)}...` : "null");
 
     if (!token) {
       throw new Error("Authentication token not found. Please sign in again.");

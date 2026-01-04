@@ -40,6 +40,20 @@
           "required": true
         }
       ]
+    },
+    {
+      "name": "get-portfolio",
+      "title": "Portfolio",
+      "subtitle": "MoveCast",
+      "description": "View your token portfolio",
+      "mode": "view"
+    },
+    {
+      "name": "sign-out",
+      "title": "Sign Out",
+      "subtitle": "MoveCast",
+      "description": "Sign out of MoveCast",
+      "mode": "no-view"
     }
   ],
   "dependencies": {

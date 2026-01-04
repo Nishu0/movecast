@@ -40,6 +40,7 @@ export interface PriceHistoryItem {
 export interface PriceHistory {
   items: PriceHistoryItem[];
   chartImageUrl: string;
+  message?: string;
 }
 
 export interface ApiResponse<T = unknown> {

@@ -47,4 +47,5 @@ export interface TokenInfo {
   export interface PriceHistory {
     items: PriceHistoryItem[];
     chartImageUrl: string;
+    message?: string;
   }
