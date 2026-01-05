@@ -89,6 +89,13 @@
       "subtitle": "MoveCast",
       "description": "Swap tokens on Meridian DEX",
       "mode": "view"
+    },
+    {
+      "name": "echelon-lend",
+      "title": "Echelon Lend",
+      "subtitle": "MoveCast",
+      "description": "Supply tokens to Echelon lending pools",
+      "mode": "view"
     }
   ],
   "dependencies": {
