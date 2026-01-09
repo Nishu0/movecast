@@ -1,0 +1,18 @@
+{
+  "name": "agent-mcp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.11.0",
+  "dependencies": {
+    "@aptos-labs/wallet-adapter-react": "^7.2.8",
+    "@pythnetwork/pyth-aptos-js": "^1.5.0",
+    "zod": "^4.3.5"
+  }
+}
