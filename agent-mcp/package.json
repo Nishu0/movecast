@@ -13,6 +13,7 @@
   "dependencies": {
     "@aptos-labs/wallet-adapter-react": "^7.2.8",
     "@pythnetwork/pyth-aptos-js": "^1.5.0",
+    "langchain": "^1.2.7",
     "zod": "^4.3.5"
   }
 }

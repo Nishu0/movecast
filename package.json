@@ -96,6 +96,23 @@
       "subtitle": "MoveCast",
       "description": "Supply tokens to Echelon lending pools",
       "mode": "view"
+    },
+    {
+      "name": "movecast-ai",
+      "title": "Movecast AI",
+      "subtitle": "MoveCast",
+      "description": "Ask anything about your wallet, portfolio, or tokens using natural language",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "openaiApiKey",
+      "type": "password",
+      "required": false,
+      "title": "OpenAI API Key",
+      "description": "Your OpenAI API key for AI-powered queries (or set OPENAI_API_KEY env var)",
+      "placeholder": "sk-..."
     }
   ],
   "dependencies": {
@@ -103,7 +120,9 @@
     "@aptos-labs/ts-sdk": "^5.2.0",
     "@raycast/api": "^1.92.0",
     "@raycast/utils": "^1.19.1",
-    "axios": "^1.13.2"
+    "axios": "^1.13.2",
+    "dotenv": "^16.6.1",
+    "openai": "^4.77.3"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.11",
